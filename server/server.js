@@ -17,6 +17,7 @@ function buildConfig(identity, plugins, userConfig = {}) {
   config.remote = identity.remote
   config = addSockets(config, plugins)
   config = fixLocalhost(config)
+  config = addRoomClient(config)
   config = forceLocalhost(config)
 
   return config
@@ -34,6 +35,19 @@ function addSockets(config, plugins) {
       incoming: { unix: [{ scope: "device", transform: "noauth", server: true }] },
     },
     remote: `unix:${join(config.path, "socket")}:~noauth:${pubkey}`, // overwrites
+  })
+}
+
+function addRoomClient(config) {
+  return merge(config, {
+    connections: {
+      incoming: {
+        tunnel: [{scope: 'public', transform: 'shs'}]
+      },
+      outgoing: {
+        tunnel: [{transform: 'shs'}]
+      }
+    }
   })
 }
 
@@ -118,6 +132,7 @@ function startDefaultPatchfoxServer(identity, cb) {
     require("ssb-invite-client"),
     require("ssb-lan"),
     require("ssb-logging"),
+    require("ssb-room-client"),
     require("ssb-meme"),
     require("ssb-no-auth"),
     require("ssb-onion"),
