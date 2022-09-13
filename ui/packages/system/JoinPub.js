@@ -1,5 +1,6 @@
 const m = require("mithril")
 const { when } = require("../../core/kernel/utils.js")
+const { isOpenRoomInvite } = require('ssb-room-client/utils')
 const JoinPubView = {
   oninit: (vnode) => {
     vnode.state.error = false
@@ -12,10 +13,11 @@ const JoinPubView = {
       ev.preventDefault()
       vnode.state.error = false
       vnode.state.msg = ""
-      vnode.state.joining = true
-      ssb.system
-        .acceptInvite(vnode.state.invite)
-        .catch((err) => {
+      vnode.state.joining = true;
+      (isOpenRoomInvite(vnode.state.invite)
+        ? ssb.rooms2.connectAndRemember(vnode.state.invite)
+        : ssb.system.acceptInvite(vnode.state.invite)
+        ).catch((err) => {
           vnode.state.joining = false
           vnode.state.error = true
           vnode.state.msg = JSON.stringify(err, null, 4)

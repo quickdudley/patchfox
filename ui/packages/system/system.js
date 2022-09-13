@@ -18,7 +18,7 @@ patchfox.package({
       label: "System",
       items: [
         {
-          label: "Join Pub",
+          label: "Join Pub/Room",
           event: "package:go",
           data: {
             pkg: "system",
